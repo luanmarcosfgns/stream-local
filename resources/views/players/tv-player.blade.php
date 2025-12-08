@@ -208,13 +208,83 @@
     .progress-container:hover .progress-tooltip {
         opacity: 1;
     }
+    /* HTML: <div class="loader"></div> */
+.loader {
+  width: 40px;
+  aspect-ratio: 1;
+   --c: linear-gradient(#000 0 0);
+   --m: radial-gradient(farthest-side,#000 92%,#0000);
+  background: 
+    var(--m) center               /12px 12px,
+    var(--c) left 50% top    -20px/8px 16px, 
+    var(--c) left 50% bottom -20px/8px 16px, 
+    var(--c) top  50% left   -20px/16px 8px, 
+    var(--c) top  50% right  -20px/16px 8px;
+  background-repeat: no-repeat;
+  animation: 
+    l18-1 1.5s infinite,
+    l18-2 1.5s infinite;
+}
+@keyframes l18-1 {
+  30%,
+  70% {background-position: 
+        center,
+        left 50% top    calc(50% - 8px),
+        left 50% bottom calc(50% - 8px),
+        top  50% left   calc(50% - 8px),
+        top  50% right  calc(50% - 8px)}
+}
+@keyframes l18-2 {
+  0%,40%   {transform: rotate(0)}
+  60%,100% {transform: rotate(90deg)}
+}
 </style>
+<style>
+ <style>
+.loader-container {
+  position: fixed;
+  inset: 0; /* equivale a top:0; left:0; right:0; bottom:0 */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: rgba(255,255,255,0.6); /* opcional */
+  z-index: 100; /* na frente de tudo */
+  pointer-events: auto;
+}
+
+/* Seu loader */
+.loader {
+  width: 40px;
+  aspect-ratio: 1;
+  animation: 
+    l3-1 2s infinite linear,
+    l3-2 3s infinite steps(1) -.5s;
+}
+
+@keyframes l3-1 {
+  0%   {transform: perspective(150px) rotateX(0deg) rotateY(0deg)}
+  50%  {transform: perspective(150px) rotateX(180deg) rotateY(0deg)}
+  100% {transform: perspective(150px) rotateX(180deg) rotateY(180deg)}
+}
+@keyframes l3-2 {
+  0%  {background: #ffa516}
+  33% {background: #f03355}
+  66% {background: #25b09b}
+}
+
+</style>
+
+</style>
+<div class="loader-container">
+  <div class="loader"></div>
+</div>
 <div class="row">
     <div class="col-12 ">
         <div class="nav-video">
             <button id="close-btn" class="float-end " title="Fechar">✕</button>
             <h5 class="px-4" id="display-titulo"></h5>
         </div>
+
 
         <video id="playerVideoElement" src="" preload="metadata"></video>
 

@@ -10,7 +10,11 @@ use Illuminate\Support\Facades\Storage;
 
 class CollectionVideoController extends Controller
 {
-    private string $basePath = '/mnt/jellyflin';
+    private string $basePath ='';
+
+    public function __construct(){
+        $this->basePath =  getenv("DIRETORIO_RAIZ");
+    }
 
 
     public function show($path)
@@ -19,7 +23,7 @@ class CollectionVideoController extends Controller
         set_time_limit(30);
         $fullPath = $this->basePath . '/' . $path;
         if ($path === 'TV') {
-            return $this->tv($fullPath);
+            return $this->tv($path);
         }
 
         if (!is_dir($fullPath)) {
@@ -277,7 +281,7 @@ class CollectionVideoController extends Controller
     public function tv($path)
 {
     $m3u8s = [];
-    $lists = scandir($path);
+    $lists = scandir($this->basePath.'/'.$path );
 
     foreach ($lists as $item) {
         $listComprar = strtolower($item);
@@ -289,7 +293,7 @@ class CollectionVideoController extends Controller
     $canais = [];
 
     foreach ($m3u8s as $m3u8sItem) {
-        $data = file_get_contents($path . '/' . $m3u8sItem);
+        $data = file_get_contents($this->basePath.'/'.$path . '/' . $m3u8sItem);
 
         // Quebra pelos canais
         $entries = explode("#EXTINF", $data);

@@ -6,6 +6,7 @@
                      {{ $home['name'] }}
                  </a>
              @endif
+           
          @endforeach
          <a onclick="exibirInputSearch()" class="btn btn-invisivel  text-white text-decoration-none text m-2 rounded-pill"
              href="#!">
@@ -23,6 +24,6 @@
 
              <div class="col-12">
                  <input id="search" onfocusout="esconderInputSearch()"
-                     class="form-control bg-dark text-white d-none">
+                     class="form-control bg-dark text-white d-none" placeholder="Digite a sua pesquisa...">
              </div>
          </div>
