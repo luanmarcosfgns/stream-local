@@ -10,6 +10,19 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
 
     {{-- CSS global --}}
+
+    @stack('styles')
+</head>
+<body>
+<div class="container content-wrapper">
+    @yield('template')
+</div>
+
+{{-- Scripts --}}
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+@stack('scripts')
+{{-- css --}}
     <style>
 
         body,.card {
@@ -33,25 +46,8 @@
         }
     </style>
 
-    @stack('styles')
-</head>
-<body>
+@stack('css')
 
-{{-- Navbar --}}
-{{--<nav class="navbar navbar-custom mb-4">--}}
-{{--    <div class="container">--}}
-{{--        <a href="/">🏠 Oliveira Nascimento</a>--}}
-{{--    </div>--}}
-{{--</nav>--}}
-
-{{-- Conteúdo principal --}}
-<div class="container content-wrapper">
-    @yield('content')
-</div>
-
-{{-- Scripts --}}
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-@stack('scripts')
 
 </body>
 </html>

@@ -18,12 +18,17 @@ class CollectionVideoController extends Controller
 
         set_time_limit(30);
         $fullPath = $this->basePath . '/' . $path;
+        if ($path === 'TV') {
+            return $this->tv($fullPath);
+        }
 
         if (!is_dir($fullPath)) {
             abort(404);
         }
 
         $homes = $this->listDirectories($this->basePath);
+
+
 
         $items = $this->listDirectories($fullPath);
 
@@ -39,7 +44,7 @@ class CollectionVideoController extends Controller
     {
 
         $items = scandir($path);
-        $items = array_diff($items, ['.', '..', 'lost+found', '.Trash-1000','folder.png','folder.jpg','folder.webp']);
+        $items = array_diff($items, ['.', '..', 'lost+found', '.Trash-1000', 'folder.png', 'folder.jpg', 'folder.webp']);
         usort($items, 'strnatcasecmp');
 
         $result = [];
@@ -68,8 +73,6 @@ class CollectionVideoController extends Controller
                     'id' => md5($full)
                 ];
             }
-
-
         }
 
         return $result;
@@ -198,8 +201,6 @@ class CollectionVideoController extends Controller
         } catch (\Exception $exception) {
             return false;
         }
-
-
     }
 
 
@@ -221,7 +222,6 @@ class CollectionVideoController extends Controller
             $tempo = floatval($data['format']['duration']);
             $tempo = $tempo / 2;
             return gmdate("H:i:s", $tempo);
-
         }
 
         return null;
@@ -241,26 +241,26 @@ class CollectionVideoController extends Controller
     private function getFisrtThumbnail($path)
     {
 
-        if ( file_exists($path.DIRECTORY_SEPARATOR.'folder.png')) {
+        if (file_exists($path . DIRECTORY_SEPARATOR . 'folder.png')) {
 
             $listFolders = explode(DIRECTORY_SEPARATOR, $path);
             $protocolo = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https://' : 'http://';
 
-            return $protocolo.$_SERVER['HTTP_HOST'].'/file/'.$listFolders[(count($listFolders) - 2)].'/'. $listFolders[(count($listFolders) - 1)].'/'.'folder.png';
+            return $protocolo . $_SERVER['HTTP_HOST'] . '/file/' . $listFolders[(count($listFolders) - 2)] . '/' . $listFolders[(count($listFolders) - 1)] . '/' . 'folder.png';
         }
-        if ( file_exists($path.DIRECTORY_SEPARATOR.'folder.jpg')) {
+        if (file_exists($path . DIRECTORY_SEPARATOR . 'folder.jpg')) {
 
             $listFolders = explode(DIRECTORY_SEPARATOR, $path);
             $protocolo = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https://' : 'http://';
 
-            return $protocolo.$_SERVER['HTTP_HOST'].'/file/'.$listFolders[(count($listFolders) - 2)].'/'. $listFolders[(count($listFolders) - 1)].'/'.'folder.jpg';
+            return $protocolo . $_SERVER['HTTP_HOST'] . '/file/' . $listFolders[(count($listFolders) - 2)] . '/' . $listFolders[(count($listFolders) - 1)] . '/' . 'folder.jpg';
         }
-        if ( file_exists($path.DIRECTORY_SEPARATOR.'folder.webp')) {
+        if (file_exists($path . DIRECTORY_SEPARATOR . 'folder.webp')) {
 
             $listFolders = explode(DIRECTORY_SEPARATOR, $path);
             $protocolo = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https://' : 'http://';
 
-            return $protocolo.$_SERVER['HTTP_HOST'].'/file/'.$listFolders[(count($listFolders) - 2)].'/'. $listFolders[(count($listFolders) - 1)].'/'.'folder.webp';
+            return $protocolo . $_SERVER['HTTP_HOST'] . '/file/' . $listFolders[(count($listFolders) - 2)] . '/' . $listFolders[(count($listFolders) - 1)] . '/' . 'folder.webp';
         }
 
 
@@ -271,10 +271,87 @@ class CollectionVideoController extends Controller
 
                 return $this->getThumbnail($item['full']);
             }
-
         }
         return asset('storage/icons/folder.png');
     }
+    public function tv($path)
+{
+    $m3u8s = [];
+    $lists = scandir($path);
+
+    foreach ($lists as $item) {
+        $listComprar = strtolower($item);
+        if (strripos($listComprar, 'm3u') !== false || strripos($listComprar, 'm3u8') !== false) {
+            $m3u8s[] = $item;
+        }
+    }
+
+    $canais = [];
+
+    foreach ($m3u8s as $m3u8sItem) {
+        $data = file_get_contents($path . '/' . $m3u8sItem);
+
+        // Quebra pelos canais
+        $entries = explode("#EXTINF", $data);
+
+        foreach ($entries as $entry) {
+
+            // Ignorar entradas vazias
+            if (!trim($entry)) continue;
+
+            $linhas = explode("\n", $entry);
+
+            // Linha com atributos e nome do canal
+            $infoLine = array_shift($linhas);
+
+            // URL é geralmente logo após
+            $url = trim($linhas[0] ?? '');
+
+            // Extrair atributos tvg-id="" tvg-logo etc
+            preg_match_all('/(\w+)=["](.*?)["]/', $infoLine, $matches);
+            $attrs = array_combine($matches[1], $matches[2]);
+
+            // Extrair nome do canal depois da vírgula
+            preg_match('/,(.*)$/', $infoLine, $nomeMatch);
+            $nome = trim($nomeMatch[1] ?? '');
+            if(empty($nome) || empty($url)) {
+                continue;
+            }
+         
+   
+            // Monta o array
+            $canais[] = [
+                "tvg-id"      => $attrs['tvg-id'] ?? null,
+                "tvg-name"    => $attrs['tvg-name'] ?? null,
+                "thumbnail"    => $attrs['logo'] ?? null,
+                "group-title" => $attrs['group-title'] ?? null,
+                "name"        => $nome,
+                "url"         => $url,
+                "file"        => $m3u8sItem, // de qual lista veio,
+                "id"        => $this->uuid()
+            ];
+        }
+    }
+        $homes = $this->listDirectories($this->basePath);
+    return view('collections.tv', [
+        'm3u8s' => $m3u8s,
+        'path' => $path,
+        'canais' => $canais, // <- agora envia os canais para a view
+        'homes' => $homes, // <- agora envia os canais para a view
+    ]);
+}
+
+public function uuid(): string
+{
+     return sprintf(
+        '%04x%04x-%04x-%04x-%04x-%04x%04x%04x',
+        mt_rand(0, 0xffff), mt_rand(0, 0xffff),
+        mt_rand(0, 0xffff),
+        mt_rand(0, 0x0fff) | 0x4000,
+        mt_rand(0, 0x3fff) | 0x8000,
+        mt_rand(0, 0xffff), mt_rand(0, 0xffff), mt_rand(0, 0xffff)
+    );
+}
 
 
 }
