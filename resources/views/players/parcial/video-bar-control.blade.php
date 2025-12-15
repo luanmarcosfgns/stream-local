@@ -17,12 +17,12 @@
 
              <div class="col-12 ">
                  <div class="row">
-                     <div class="col-4 pt-4 px-5
+                     <div class="col-md-4 col-12 pt-4 px-5
                                 ">
                          <!-- Tempo atual / duração total -->
                          <span id="timeClock">00:00</span> / <span id="durationClock">00:00</span>
                      </div>
-                     <div class="col-4 text-center"><!-- REWIND -10s -->
+                     <div class="col-md-4 col-12 text-center"><!-- REWIND -10s -->
                          <button class="btnPlayer " id="rewind" title="-10 segundos">
                              <svg xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="0 0 24 24">
                                  <path fill="#ffffff"
@@ -43,8 +43,8 @@
                              </svg>
                          </button>
                      </div>
-                     <div class="col-4 pt-4 px-5">
-                         <div class="text-end">
+                     <div class="col-md-4 col-12 pt-4 px-5">
+                         <div class="text-end text-md-center">
                              <svg width="30" height="30" xmlns="http://www.w3.org/2000/svg"
                                  viewBox="0 0 480 512">
                                  <path

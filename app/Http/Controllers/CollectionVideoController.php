@@ -67,7 +67,7 @@ class CollectionVideoController extends Controller
                     'id' => md5($full)
                 ];
             }
-            if (is_file($full)) {
+            if (is_file($full) && !stripos($item,'.part') ) {
                 $result[] = [
                     'name' => $item,
                     'full' => $full,
@@ -321,8 +321,8 @@ class CollectionVideoController extends Controller
             if(empty($nome) || empty($url)) {
                 continue;
             }
-         
-   
+
+
             // Monta o array
             $canais[] = [
                 "tvg-id"      => $attrs['tvg-id'] ?? null,

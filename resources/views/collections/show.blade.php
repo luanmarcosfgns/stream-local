@@ -74,7 +74,7 @@
 
                         card.querySelector('.open-file').querySelector('div').innerHTML = card
                             .querySelector('.open-file').querySelector('div').innerHTML +
-                            '<span class="badge text-bg-success">Assitido</span>';
+                            '<span class="badge text-bg-success">Assistido</span>';
                     }
 
 
